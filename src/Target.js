@@ -66,4 +66,6 @@ module.exports.isReceiver = function(receiver) {
   return Object.getPrototypeOf(receiver) === MetricsReceiver;
 };
 
+module.exports.MetricsTarget = MetricsTarget;
+module.exports.MetricsReceiver = MetricsReceiver;
 
