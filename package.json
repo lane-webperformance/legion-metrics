@@ -1,6 +1,6 @@
 {
   "name": "legion-metrics",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Generate samples and merge them into a metrics storage object. Part of the Legion load testing framework.",
   "main": "src/index.js",
   "scripts": {
