@@ -1,4 +1,7 @@
 
+[![Build Status](https://travis-ci.org/lane-webperformance/legion-metrics.svg?branch=master)](https://travis-ci.org/lane-webperformance/legion-metrics)
+[![Dependency Status](https://gemnasium.com/badges/github.com/lane-webperformance/legion-metrics.svg)](https://gemnasium.com/github.com/lane-webperformance/legion-metrics)
+
 Legion-metrics is a library to capture, merge, and summarize performance
 metrics from a load test.
 
