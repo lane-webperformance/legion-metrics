@@ -10,12 +10,11 @@
   "author": "Christopher Lane Hinson <lane@webperformance.com>",
   "license": "APSL-2.0",
   "dependencies": {
-    "eslint": "^2.10.2",
     "immutable": "^3.7.6",
     "ramda": "^0.21.0"
   },
   "devDependencies": {
-    "eslint": "*",
+    "eslint": "^2.10.2",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jasmine-immutablejs-matchers": "^0.1.2",
