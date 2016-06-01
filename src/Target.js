@@ -2,7 +2,8 @@ var immutable = require('immutable');
 
 var MetricsTarget = {
   _metrics : null,
-  _merge : function() { throw new Error('MetricsTarget._merge: not defined'); }
+  _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
+  _type : 'legion-metrics/MetricsTarget'
 };
 
 MetricsTarget.receiver = function() {
@@ -25,7 +26,8 @@ MetricsTarget.clear = function() {
 
 var MetricsReceiver = {
   _target : undefined,
-  _tags : immutable.Set()
+  _tags : immutable.Set(),
+  _type : 'legion-metrics/MetricsReceiver'
 };
 
 MetricsReceiver.receive = function(sample) {
@@ -59,11 +61,11 @@ module.exports.create = function(merge) {
 };
 
 module.exports.isTarget = function(target) {
-  return Object.getPrototypeOf(target) === MetricsTarget;
+  return target._type === MetricsTarget._type;
 };
 
 module.exports.isReceiver = function(receiver) {
-  return Object.getPrototypeOf(receiver) === MetricsReceiver;
+  return receiver._type === MetricsReceiver._type;
 };
 
 module.exports.MetricsTarget = MetricsTarget;
