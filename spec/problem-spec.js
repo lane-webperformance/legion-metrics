@@ -1,5 +1,6 @@
+'use strict';
 
-var problem = require('../src/index').problem;
+const problem = require('../src/index').problem;
 
 describe('The sample.problem function', function() {
   it('can provide a problem summary', function() {

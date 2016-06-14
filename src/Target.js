@@ -1,6 +1,8 @@
-var immutable = require('immutable');
+'use strict';
 
-var MetricsTarget = {
+const immutable = require('immutable');
+
+const MetricsTarget = {
   _metrics : null,
   _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
   _type : 'legion-metrics/MetricsTarget'
@@ -17,26 +19,26 @@ MetricsTarget.get = function() {
 };
 
 MetricsTarget.clear = function() {
-  var result = this._metrics;
+  const result = this._metrics;
 
   this._metrics = null;
 
   return result;
 };
 
-var MetricsReceiver = {
+const MetricsReceiver = {
   _target : undefined,
   _tags : immutable.Set(),
   _type : 'legion-metrics/MetricsReceiver'
 };
 
 MetricsReceiver.receive = function(sample) {
-  var sample_summary = sample.summarize ? sample.summarize() : {};
-  var tagged_metrics = this._tags.map(function(tag) {
+  const sample_summary = sample.summarize ? sample.summarize() : {};
+  const tagged_metrics = this._tags.map(function(tag) {
     return tag(sample, sample_summary);
   });
 
-  var this_target = this._target;
+  const this_target = this._target;
   tagged_metrics.forEach(function(item_to_merge) {
     this_target._metrics = this_target._merge(this_target._metrics, item_to_merge);
   });

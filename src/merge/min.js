@@ -1,3 +1,4 @@
+'use strict';
 
 // Merge values by finding their minimum.
 module.exports = function(a, b) {

@@ -1,3 +1,4 @@
+'use strict';
 
 // Merge values by finding their maximum.
 module.exports = function(a, b) {

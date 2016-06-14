@@ -1,7 +1,8 @@
+'use strict';
 
-var MetricsTarget = require('../src/index').Target;
+const MetricsTarget = require('../src/index').Target;
 
-var merge = {
+const merge = {
   'root' : function(a,b) {
     if( a === null )
       return b;
@@ -35,8 +36,8 @@ describe('The MetricsTarget object', function() {
   });
 
   it('supports merging one metrics object via a MetricsReceiver', function() {
-    var target = MetricsTarget.create(merge);
-    var receiver = target.receiver().tag(function(x) { return [x]; });
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(x) { return [x]; });
 
     receiver.receive(1);
 
@@ -44,8 +45,8 @@ describe('The MetricsTarget object', function() {
   });
 
   it('supports a summarize() method on each sample and intersectional summaries', function() {
-    var target = MetricsTarget.create(merge);
-    var receiver = target.receiver().tag(function(x,x_summary) { return x_summary; });
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(_x,x_summary) { return x_summary; });
 
     receiver.receive({ summarize: function() { return 2; } });
     receiver.receive({ summarize: function() { return 1; } });
@@ -54,22 +55,22 @@ describe('The MetricsTarget object', function() {
   });
 
   it('supports clearing and returning its current value', function() {
-    var target = MetricsTarget.create(merge);
-    var receiver = target.receiver().tag(function(x) { return [x]; });
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(x) { return [x]; });
 
     receiver.receive(1);
 
-    var value = target.clear();
+    const value = target.clear();
 
     expect(value).toEqual([1]);
     expect(target.get()).toBe(null);
   });
 
   it('supports chaining a tagged MetricsReceiver', function() {
-    var target = MetricsTarget.create(merge);
+    const target = MetricsTarget.create(merge);
 
-    var tag_identity = function(x) { return [x]; };
-    var tag_upper = function(x) { return [x.toUpperCase()]; };
+    const tag_identity = function(x) { return [x]; };
+    const tag_upper = function(x) { return [x.toUpperCase()]; };
 
     target.receiver().tag(tag_identity).receive('foo');
     target.receiver().tag(tag_upper).receive('bar');
@@ -83,15 +84,14 @@ describe('The MetricsTarget object', function() {
   });
 
   it('can merge a lot of stuff', function() {
-    var target = MetricsTarget.create(merge);
-    var receiver = target.receiver().tag(function(x) { return x; });
-    var i;
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(x) { return x; });
 
-    var start_time = Date.now();
-    for( i = 0; i < 100000; i++ ) {
+    const start_time = Date.now();
+    for( let i = 0; i < 100000; i++ ) {
       receiver.receive(Math.random());
     }
-    var stop_time = Date.now();
+    const stop_time = Date.now();
 
     expect(target.get()).toBeGreaterThan(0.9);
     expect(target.get()).toBeLessThan(1.0);

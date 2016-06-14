@@ -1,4 +1,6 @@
-var immutable = require('immutable');
+'use strict';
+
+const immutable = require('immutable');
 
 // Merges values by joining them into a big collection. Supports (at least)
 // javascript arrays and Immutable.Set.  The result of a merge will be an

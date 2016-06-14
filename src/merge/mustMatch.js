@@ -1,3 +1,4 @@
+'use strict';
 
 // Merges two identical values into the same value.
 // Throws an error if the values are not identical.

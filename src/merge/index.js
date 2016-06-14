@@ -1,11 +1,15 @@
-var merge = {};
+'use strict';
 
-merge.sum = require('./sum');
+const merge = {};
+
+merge.avg = require('./avg');
+merge.events = require('./set');
 merge.max = require('./max');
 merge.min = require('./min');
-merge.set = require('./set');
-merge.events = merge.set;
 merge.object = require('./object');
+merge.set = require('./set');
+merge.sum = require('./sum');
+
 merge.root = function(a,b) {
   a = a || {};
   b = b || {};

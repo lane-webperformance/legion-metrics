@@ -1,5 +1,6 @@
+'use strict';
 
-var Problem = {};
+const Problem = {};
 
 Problem.summarize = function() {
   return {

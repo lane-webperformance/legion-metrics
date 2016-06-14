@@ -1,4 +1,6 @@
-var immutable = require('immutable');
+'use strict';
+
+const immutable = require('immutable');
 
 // Choose which merge operation ($max/$min/$sum/$events, etc) to use when
 // merging two members of two metrics objects. Dispatch is decided based on
