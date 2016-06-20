@@ -7,7 +7,13 @@ const immutable = require('immutable');
 // Immutable.Set, however, if this is stringified to JSON, it will become
 // an array again.
 module.exports = function(a,b) {
-  if( !immutable.Set.isSet(a) )
+  if( !immutable.Set.isSet(a) ) {
     a = immutable.Set(a);
+  }
+
+  if( !immutable.Set.isSet(b) ) {
+    b = immutable.Set(b);
+  }
+
   return a.union(b);
 };

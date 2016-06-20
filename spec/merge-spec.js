@@ -1,5 +1,7 @@
 'use strict';
 
+Error.stackTraceLimit=Infinity;
+
 require('jasmine-immutablejs-matchers');
 
 const merge = require('../src/index').merge;
@@ -10,6 +12,8 @@ describe('The sum metrics operation', function() {
     expect(merge.sum(5,7)).toBe(12);
     expect(merge.min(5,7)).toBe(5);
     expect(merge.max(5,7)).toBe(7);
+    expect(merge.avg(merge.avg.singleton(5),merge.avg.singleton(7)).avg).toBe(6);
+    expect(merge.avg(merge.avg.singleton(5),merge.avg.singleton(7)).size).toBe(2);
   });
 
   it('does not allow non-numerical values', function() {
@@ -19,6 +23,7 @@ describe('The sum metrics operation', function() {
     expect(function() { return merge.sum(2,'three'); }).toThrow();
     expect(function() { return merge.min(2,'three'); }).toThrow();
     expect(function() { return merge.max(2,'three'); }).toThrow();
+    expect(function() { return merge.avg(merge.avg.singleton(2),merge.avg.singleton('three')); }).toThrow();
   });
 });
 
@@ -31,6 +36,7 @@ describe('The merge metrics operations', function() {
     const sample_1 = {
       '$min': 5,
       '$max': 5,
+      '$avg': merge.avg.singleton(5),
       'total$sum': 5,
       'count$sum': 1,
       '$events': [5] };
@@ -38,18 +44,20 @@ describe('The merge metrics operations', function() {
     const sample_2 = {
       '$min': 3,
       '$max': 3,
+      '$avg': merge.avg.singleton(3),
       'total$sum': 3,
       'count$sum': 1,
       '$events': [3] };
 
     const result = merge.object(sample_1, sample_2);
 
-    expect(result).toEqualImmutable(immutable.Map({
+    expect(JSON.parse(JSON.stringify(result))).toEqual({
       '$min': 3,
       '$max': 5,
+      '$avg' : { avg: 4, size: 2 },
       'total$sum': 8,
       'count$sum': 2,
-      '$events': immutable.Set([5,3])}));
+      '$events': [5,3]});
   });
 
   it('can merge heterogenous objects', function() {
@@ -69,7 +77,7 @@ describe('The merge metrics operations', function() {
 
     expect(result).toEqualImmutable(immutable.Map({
       'data': immutable.Map({ '$min': 3, '$max': 5, '$sum' : 20 }),
-      'avg': immutable.Map({ 'total$sum': 100, 'count$sum': 5 }),
+      'avg': sample_2.avg,
       '$events': immutable.Set(['foo','bar','baz','quux']) }));
   });
 

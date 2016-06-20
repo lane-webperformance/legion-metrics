@@ -9,7 +9,7 @@ function chooseMergeOperation(available_operations, a, b, key) {
   if( !key.includes('$') )
     return available_operations.object(a,b);
 
-  return available_operations[key.split('$').pop()](a,b);
+  return available_operations[key.split('$').pop()].call(available_operations,a,b);
 }
 
 // Merges objects by copying all of the keys of each object into a single
@@ -20,7 +20,13 @@ function chooseMergeOperation(available_operations, a, b, key) {
 // The result will be an immutable map, although this method will accept
 // plain-old-javascript-objects, too.
 module.exports = function(a,b) {
-  if( !immutable.Map.isMap(a) )
+  if( !immutable.Map.isMap(a) ) {
     a = immutable.Map(a);
+  }
+
+  if( !immutable.Map.isMap(b) ) {
+    b = immutable.Map(b);
+  }
+
   return a.mergeWith(chooseMergeOperation.bind(undefined, this), b);
 };

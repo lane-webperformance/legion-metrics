@@ -14,8 +14,9 @@ merge.root = function(a,b) {
   a = a || {};
   b = b || {};
 
-  if( typeof a === 'object' )
+  if( typeof a === 'object' ) {
     return merge.object(a,b);
+  }
 
   throw new Error('Not sure what to do with ' + typeof a + ' (' + a + ')');
 };
