@@ -14,7 +14,9 @@ describe('The sample function', function() {
         value : 2,
         unit : 'felines',
         interpretation : 'number of kittens in household'
-      }} );
+      },
+      timestamp: sample.timestamp()
+    });
 
     expect(s.summarize().values.myValue.$min).toEqual(5);
     expect(s.summarize().values.myValue.$max).toEqual(5);
@@ -35,14 +37,12 @@ describe('The sample function', function() {
 
   it('returns a sample event', function() {
     const s = sample( {
-      myValue : {
-        value : 5,
-        unit : 'seconds',
-        interpretation : 'myValue in seconds' }
+      duration: sample.duration(5),
+      timestamp: sample.timestamp()
     });
 
     expect(s.type).toEqual('sample');
-    expect(s.values.myValue.value).toEqual(5);
+    expect(s.values.duration.value).toEqual(5);
     expect(s.values.timestamp.value).not.toBeGreaterThan(Date.now());
     expect(s.values.timestamp.value).toBeGreaterThan(Date.now()-100);
   });

@@ -32,19 +32,29 @@ module.exports = function(values, details) {
     Object.create(Sample),
     details, {
       type:  'sample',
-      values: Object.assign({}, values, {
-        timestamp : {
-          value : Date.now(),
-          unit : 'milliseconds since 1970',
-          interpretation : 'The timestamp of an event or sample, as measured in milliseconds since 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970.\n' +
-                           'See also: https://en.wikipedia.org/wiki/Unix_time.\n' +
-                           'See also: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now'
-        }
-      })
+      values: Object.assign({}, values)
     });
 
   // fail fast if we can't summarize
   result.summarize();
 
   return result;
+};
+
+module.exports.timestamp = function() {
+  return {
+    value : Date.now(),
+    unit : 'milliseconds since 1970',
+    interpretation : 'The timestamp of an event or sample, as measured in milliseconds since 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970.\n' +
+                     'See also: https://en.wikipedia.org/wiki/Unix_time.\n' +
+                     'See also: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now'
+  };
+};
+
+module.exports.duration = function(value) {
+  return {
+    value : value,
+    unit : 'milliseconds',
+    interpretation : 'Time needed to complete an operation.'
+  };
 };

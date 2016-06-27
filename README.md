@@ -12,46 +12,56 @@ metrics.merge
 
 A dictionary of rules for merging two different pieces of data.
 
-### metrics.merge.events
+### metrics.merge.avg(l,r)
+
+A merge rule that computes the average two values, internally stored as
+{ avg, size }.
+
+#### metrics.merge.avg.singleton()
+
+To construct an avg object that can be merged with metrics.merge.avg.
+
+### metrics.merge.events(l,r)
 
 See: merge.set
 
-### metrics.merge.max
+### metrics.merge.max(l,r)
 
 A merge rule that takes the maximum of two values.
 
-### metrics.merge.min
+### metrics.merge.min(l,r)
 
 A merge rule that takes the minimum of two values.
 
-### metrics.merge.mustMatch
+### metrics.merge.mustMatch(l,r)
 
 A merge rule that will throw an error if every value is not equal. This is a
 to ensure that incompatible groups of data will not be merged to create a
 misleading result.
 
-### metrics.merge.object
+### metrics.merge.object(l,r)
 
 Merges two objects by recursively merging their members. The merge rule that
 should be chosen for each member is defined by the part of the member's name
 after the '$' sign.
 
-Internally, objects are merged as immutable
+Internally, objects are merged as [immutable]
 (https://facebook.github.io/immutable-js/docs/#/) maps.
 
-### metrics.merge.set
+### metrics.merge.set(l,r)
 
 Merges two arrays, removing duplicates. Internally, sets are merged
 as immutable sets.
 
-### metrics.merge.sum
+### metrics.merge.sum(l,r)
 
 A merge rule that takes the sum of two values.
 
 metrics.problem(error, [details])
 ---------------------------------
 
-Returns a new problem object.
+Returns a new problem object. Objects of this type are "summarizable",
+meaning that they support a summarize() method.
 
 * error: can be a string or Error object.
 * details: if provided, must be an object which will be merged into the
@@ -60,12 +70,42 @@ problem object using Object.assign().
 metrics.sample(value, [details])
 --------------------------------
 
-Returns a new sample point.
+Returns a new sample point. Objects of this type are "summarizable",
+meaning that they support a summarize() method.
 
-* value: can be any type, but is usually numerical, and if so, it can be
-incorporated into a statistical summary.
+* value: a dictionary of measurements, where each measurement has the form:
+  * value: a number
+  * units: a human-readable string describing the unit of the measurement,
+    such as "milliseconds" or "milliseconds since 1970".
+  * interpretation: a human readable string describing the measurement.
 * details: if provided, must be an object which will be merged into the
 sample orbject using Object.assign().
+
+### metrics.sample.duration(milliseconds)
+
+Construct a duration value, in milliseconds, for use in constructing a sample.
+For example:
+
+	metrics.sample({
+	  duration: metrics.sample.duration(500) // 0.5 seconds
+	  timestamp: metrics.sample.timestamp()
+	});
+
+### metrics.sample.timestamp()
+
+Construct a timestamp value, in milliseconds since 1970 (UNIX time), for use
+in constructing a sample. See example above.
+
+metrics.summary(summary)
+--------------------------------
+
+Returns a new summary object. This summary object can be used wherever
+we would use a problem() or sample() object, but wraps a summary
+of that other data. Objects of this type are "summarizable",
+meaning that they support a summarize() method.
+
+* summary: the output of a summarize() method call, or the merged output
+of several summarize() method calls.
 
 metrics.Target
 --------------
