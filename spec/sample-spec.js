@@ -15,7 +15,7 @@ describe('The sample function', function() {
         unit : 'felines',
         interpretation : 'number of kittens in household'
       },
-      timestamp: sample.timestamp()
+      timestamp: sample.timestamp(1000000)
     });
 
     expect(s.summarize().values.myValue.$min).toEqual(5);
@@ -26,10 +26,8 @@ describe('The sample function', function() {
     expect(s.summarize().values.kittens.$max).toEqual(2);
     expect(s.summarize().values.kittens.$avg.avg).toEqual(2);
     expect(s.summarize().values.kittens.$avg.size).toEqual(1);
-    expect(s.summarize().values.timestamp.$min).not.toBeGreaterThan(Date.now());
-    expect(s.summarize().values.timestamp.$min).toBeGreaterThan(Date.now()-100);
-    expect(s.summarize().values.timestamp.$max).not.toBeGreaterThan(Date.now());
-    expect(s.summarize().values.timestamp.$max).toBeGreaterThan(Date.now()-100);
+    expect(s.summarize().values.timestamp.$min).toBe(1000000);
+    expect(s.summarize().values.timestamp.$max).toBe(1000000);
 
     expect(s.summarize().values.kittens.unit$set).toEqual(['felines']);
     expect(s.summarize().values.kittens.interpretation$set).toEqual(['number of kittens in household']);

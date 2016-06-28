@@ -41,9 +41,12 @@ module.exports = function(values, details) {
   return result;
 };
 
-module.exports.timestamp = function() {
+module.exports.timestamp = function(value) {
+  if( typeof value === 'undefined' )
+    value = Date.now();
+
   return {
-    value : Date.now(),
+    value : value,
     unit : 'milliseconds since 1970',
     interpretation : 'The timestamp of an event or sample, as measured in milliseconds since 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970.\n' +
                      'See also: https://en.wikipedia.org/wiki/Unix_time.\n' +
