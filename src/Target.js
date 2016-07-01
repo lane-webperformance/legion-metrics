@@ -3,6 +3,7 @@
 const immutable = require('immutable');
 
 const MetricsTarget = {
+  _callback : () => undefined,
   _metrics : null,
   _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
   _type : 'legion-metrics/MetricsTarget'
@@ -38,10 +39,13 @@ MetricsReceiver.receive = function(sample) {
     return tag(sample, sample_summary);
   });
 
-  const this_target = this._target;
-  tagged_metrics.forEach(function(item_to_merge) {
-    this_target._metrics = this_target._merge(this_target._metrics, item_to_merge);
+  tagged_metrics.forEach((item_to_merge) => {
+    this._target._metrics = this._target._merge(this._target._metrics, item_to_merge);
   });
+
+  Promise.resolve(this._target) //asynchronous callback to protect us from buggy users
+    .then(this._target._callback)
+    .catch(err => console.error('buggy callback attached to metrics target: ' + err)); //eslint-disable-line no-console
 
   return this;
 };
@@ -52,11 +56,15 @@ MetricsReceiver.tag = function() {
                          _tags : this._tags.union(Array.from(arguments)) });
 };
 
-module.exports.create = function(merge) {
+module.exports.create = function(merge, callback) {
   if( typeof merge !== 'object' )
     throw new Error('MetricsTarget.create(merge): merge must be a merging rule table');
 
+  if( callback && typeof callback !== 'function' )
+    throw new Error('MetricsTarget.create(merge,callback): callback must be a function');
+
   return Object.assign(Object.create(MetricsTarget), {
+    _callback : callback ? callback : () => undefined,
     _metrics : null,
     _merge : merge.root.bind(merge)
   });

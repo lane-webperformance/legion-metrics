@@ -10,6 +10,7 @@ const merge = {
       return Math.max(a,b);
     if( Array.isArray(a) )
       return [].concat(a,b);
+    throw new Error('unhandled case');
   }
 };
 
@@ -29,6 +30,25 @@ describe('The MetricsTarget object', function() {
   it('supports a create() operation', function() {
     expect(MetricsTarget.create(merge)).toBeDefined();
     expect(function() { return MetricsTarget.create(); }).toThrow();
+  });
+
+  it('supports callbacks', function(done) {
+    let n = 0;
+    const callback = t => {
+      expect(MetricsTarget.isTarget(t)).toBe(true);
+      n++;
+    };
+    const target = MetricsTarget.create(merge,callback);
+    const receiver = target.receiver().tag(x => [x]);
+
+    for( let i = 0; i < 10; i++ )
+      receiver.receive(i); //this actually queues up 10 callbacks that should all fire at once . . .
+
+    Promise.resolve().then(() => {
+      expect(target.get()).toEqual([0,1,2,3,4,5,6,7,8,9]);
+      expect(n).toEqual(10);
+      done();
+    });
   });
 
   it('supports creating MetricsReceivers', function() {
