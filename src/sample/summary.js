@@ -7,8 +7,8 @@ Summary.summarize = function() {
 };
 
 module.exports = function(summary) {
-  return {
+  return Object.assign(Object.create(Summary), {
     type : 'summary',
     summary : summary
-  };
+  });
 };

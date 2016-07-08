@@ -4,10 +4,12 @@ const Problem = {};
 
 Problem.summarize = function() {
   return {
-    problems$sum : 1,
-    problems$events : [this],
-    time$min : this.time,
-    time$max : this.time
+    problems : {
+      problems$sum : 1,
+      problems$events : [JSON.parse(JSON.stringify(this))],
+      time$min : this.time,
+      time$max : this.time
+    }
   };
 };
 
