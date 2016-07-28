@@ -29,6 +29,7 @@ describe('Generic tagging', function() {
     tags.outcome.success(x, smry);
 
     expect( x.tags.outcome ).toEqual(['success']);
+    expect( JSON.parse(JSON.stringify(x)).tags.outcome ).toEqual(['success']);
   });
 
   it('leaves a trace on the summary', function() {

@@ -5,7 +5,7 @@ const R = require('ramda');
 module.exports = function(axis,tag) {
   return function(sample,summary) {
     // annotate the sample with this tag
-    sample.tags = sample.tags || [];
+    sample.tags = sample.tags || {};
     sample.tags[axis] = sample.tags[axis] || [];
     sample.tags[axis].push(tag);
 
