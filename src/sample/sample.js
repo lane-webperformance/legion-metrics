@@ -11,7 +11,7 @@ Sample.summarize = function() {
     const v = this.values[k].value;
 
     if( typeof v !== 'number' || Number.isNaN(v) || !Number.isFinite(v) )
-      throw new Error('Not a valid sample value: ' + v);
+      throw new Error('Not a valid sample value for ' + k + ': ' + v);
 
     result[k] = {
       $max : v,
