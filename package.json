@@ -1,6 +1,6 @@
 {
   "name": "legion-metrics",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Generate samples and merge them into a metrics storage object. Part of the Legion load testing framework.",
   "main": "src/index.js",
   "scripts": {
@@ -10,8 +10,8 @@
   "author": "Christopher Lane Hinson <lane@webperformance.com>",
   "license": "APSL-2.0",
   "dependencies": {
-    "immutable": "^3.7.6",
-    "ramda": "^0.21.0"
+    "immutable": "^3.8.1",
+    "ramda": "^0.23.0"
   },
   "devDependencies": {
     "eslint": "^2.10.2",
