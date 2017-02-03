@@ -25,8 +25,7 @@ Sample.summarize = function() {
 };
 
 module.exports = function(values, details) {
-  if( typeof values !== 'object' )
-    throw new Error('parameter "values" must be a dictionary of sample values { value : number, unit : string, interpretation : string }');
+  module.exports.assertSampleValues(values);
 
   const result = Object.assign(
     Object.create(Sample),
@@ -40,6 +39,38 @@ module.exports = function(values, details) {
 
   return result;
 };
+
+module.exports.assertSampleValues = function(values) {
+  if( typeof values !== 'object' )
+    throw new Error('sample values must be a dictionary of sample blocks: { value: number, unit: string, interpretation: string }');
+
+  if( Object.getPrototypeOf(values) !== Object.prototype )
+    throw new Error('sample values must be a plain javascript object (no prototype)');
+
+  Object.keys(values).forEach(k => {
+    assertSampleBlock(values[k]);
+  });
+};
+
+// Part of assertSampleValues. Asserts that a particular entry of a sample values object has the format { value: number, unit: string, interpretation: string }.
+function assertSampleBlock(block) {
+  if( typeof block !== 'object' )
+    throw new Error('sample values must be a dictionary of sample blocks: { value: number, unit: string, interpretation: string }');
+
+  if( typeof block.value !== 'number' )
+    throw new Error('sample.value must be a number');
+
+  if( typeof block.unit !== 'string' && block.unit !== undefined )
+    throw new Error('sample.unit must be a string describing the unit of measurement');
+
+  if( typeof block.interpretation !== 'string' && block.unit !== undefined )
+    throw new Error('sample.interpretation must be a human-readable string briefly explaining the meaning of the measurement');
+
+  Object.keys(block).forEach(k => {
+    if( !['value','unit','interpretation'].includes(k) )
+      throw new Error('unexpected key: ' + k);
+  });
+}
 
 module.exports.timestamp = function(value) {
   if( typeof value === 'undefined' )

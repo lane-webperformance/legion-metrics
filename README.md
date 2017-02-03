@@ -79,7 +79,7 @@ meaning that they support a summarize() method.
     such as "milliseconds" or "milliseconds since 1970".
   * interpretation: a human readable string describing the measurement.
 * details: if provided, must be an object which will be merged into the
-sample orbject using Object.assign().
+sample object using Object.assign().
 
 ### metrics.sample.duration(milliseconds)
 
@@ -95,6 +95,11 @@ For example:
 
 Construct a timestamp value, in milliseconds since 1970 (UNIX time), for use
 in constructing a sample. See example above.
+
+### metrics.sample.assertSampleValues(values)
+
+Asserts that the parameter is a valid input to metrics.sample(values). If it is not, throws an exception.
+The parameter must be a dictionary of the form { value: number, unit: string, interpretation: string }.
 
 metrics.summary(summary)
 --------------------------------
