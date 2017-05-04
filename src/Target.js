@@ -20,8 +20,8 @@ MetricsTarget.get = function() {
 };
 
 MetricsTarget.flush = function() {
-  return Promise.resolve(this._target)
-    .then(this._target._callback)
+  return Promise.resolve(this)
+    .then(this._callback)
     .catch(err => {
       console.error('buggy callback attached to metrics target: ' + err); //eslint-disable-line no-console
       throw err;
@@ -52,7 +52,7 @@ MetricsReceiver.receive = function(sample) {
     this._target._metrics = this._target._merge(this._target._metrics, item_to_merge);
   });
 
-  this.flush();
+  this._target.flush();
 
   return this;
 };

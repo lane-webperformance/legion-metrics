@@ -13,6 +13,6 @@ module.exports.testcase = module.exports.generic('testcase');
 module.exports.testcaseCompletion = module.exports.generic('testcaseCompletion');
 
 module.exports.step = module.exports.generic('step');
-module.exports.stepCompletion = module.exports.stepCompletion('stepCompletion');
+module.exports.stepCompletion = module.exports.generic('stepCompletion');
 
 module.exports.raw = require('./raw');
