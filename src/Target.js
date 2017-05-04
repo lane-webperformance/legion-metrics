@@ -19,6 +19,15 @@ MetricsTarget.get = function() {
   return this._metrics;
 };
 
+MetricsTarget.flush = function() {
+  return Promise.resolve(this._target)
+    .then(this._target._callback)
+    .catch(err => {
+      console.error('buggy callback attached to metrics target: ' + err); //eslint-disable-line no-console
+      throw err;
+    });
+};
+
 MetricsTarget.clear = function() {
   const result = this._metrics;
 
@@ -43,9 +52,7 @@ MetricsReceiver.receive = function(sample) {
     this._target._metrics = this._target._merge(this._target._metrics, item_to_merge);
   });
 
-  Promise.resolve(this._target) //asynchronous callback to protect us from buggy users
-    .then(this._target._callback)
-    .catch(err => console.error('buggy callback attached to metrics target: ' + err)); //eslint-disable-line no-console
+  this.flush();
 
   return this;
 };
@@ -71,11 +78,11 @@ module.exports.create = function(merge, callback) {
 };
 
 module.exports.isTarget = function(target) {
-  return target._type === MetricsTarget._type;
+  return target && target._type === MetricsTarget._type;
 };
 
 module.exports.isReceiver = function(receiver) {
-  return receiver._type === MetricsReceiver._type;
+  return receiver && receiver._type === MetricsReceiver._type;
 };
 
 module.exports.MetricsTarget = MetricsTarget;
