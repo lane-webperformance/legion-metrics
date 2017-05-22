@@ -32,6 +32,21 @@ describe('The MetricsTarget object', function() {
     expect(function() { return MetricsTarget.create(); }).toThrow();
   });
 
+  it('supports default callback that is equivalent to just calling get()', function(done) {
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(x => [x]);
+
+    for( let i = 0; i < 10; i++ )
+      receiver.receive(i); //this actually queues up 10 callbacks that should all fire at once . . .
+
+    Promise.resolve().then(() => {
+      expect(target.get()).toEqual([0,1,2,3,4,5,6,7,8,9]);
+      
+      return target.flush()
+        .then(x => expect(x).toEqual([0,1,2,3,4,5,6,7,8,9]));
+    }).then(done).catch(done.fail);
+  });
+
   it('supports callbacks', function(done) {
     let n = 0;
     const callback = t => {
@@ -51,9 +66,8 @@ describe('The MetricsTarget object', function() {
       
       return target.flush()
         .then(x => expect(x).toBe('hello, world'))
-        .then(() => expect(n).toBe(11))
-        .then(done);
-    });
+        .then(() => expect(n).toBe(11));
+    }).then(done).catch(done.fail);
   });
 
   it('supports creating MetricsReceivers', function() {

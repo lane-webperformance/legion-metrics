@@ -71,7 +71,7 @@ module.exports.create = function(merge, callback) {
     throw new Error('MetricsTarget.create(merge,callback): callback must be a function');
 
   return Object.assign(Object.create(MetricsTarget), {
-    _callback : callback ? callback : () => undefined,
+    _callback : callback ? callback : MetricsTarget._callback,
     _metrics : null,
     _merge : merge.root.bind(merge)
   });
