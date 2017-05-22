@@ -3,7 +3,7 @@
 const immutable = require('immutable');
 
 const MetricsTarget = {
-  _callback : () => undefined,
+  _callback : target => target.get(),
   _metrics : null,
   _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
   _type : 'legion-metrics/MetricsTarget'

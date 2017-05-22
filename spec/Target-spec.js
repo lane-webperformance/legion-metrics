@@ -37,6 +37,7 @@ describe('The MetricsTarget object', function() {
     const callback = t => {
       expect(MetricsTarget.isTarget(t)).toBe(true);
       n++;
+      return 'hello, world';
     };
     const target = MetricsTarget.create(merge,callback);
     const receiver = target.receiver().tag(x => [x]);
@@ -47,7 +48,11 @@ describe('The MetricsTarget object', function() {
     Promise.resolve().then(() => {
       expect(target.get()).toEqual([0,1,2,3,4,5,6,7,8,9]);
       expect(n).toEqual(10);
-      done();
+      
+      return target.flush()
+        .then(x => expect(x).toBe('hello, world'))
+        .then(() => expect(n).toBe(11))
+        .then(done);
     });
   });
 
