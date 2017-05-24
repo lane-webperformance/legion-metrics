@@ -57,10 +57,14 @@ MetricsReceiver.receive = function(sample) {
   return this;
 };
 
-MetricsReceiver.tag = function() {
-  return Object.assign(Object.create(MetricsReceiver),
-                       { _target : this._target,
-                         _tags : this._tags.union(Array.from(arguments)) });
+MetricsReceiver.tag = function(tag_or_tags) {
+  if( arguments.length !== 1 )
+    throw new Error('MatricsReceiver.tag() accepts one argument (tag or array of tags)');
+
+  return Object.assign(Object.create(MetricsReceiver), {
+    _target : this._target,
+    _tags : this._tags.union(Array.isArray(tag_or_tags) ? tag_or_tags : [tag_or_tags])
+  });
 };
 
 module.exports.create = function(merge, callback) {

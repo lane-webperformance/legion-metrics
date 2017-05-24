@@ -113,7 +113,7 @@ describe('The MetricsTarget object', function() {
 
     target.receiver().tag(tag_identity).receive('foo');
     target.receiver().tag(tag_upper).receive('bar');
-    target.receiver().tag(tag_identity, tag_upper).receive('baz');
+    target.receiver().tag([tag_identity, tag_upper]).receive('baz');
 
     expect(target.get()[0]).toEqual('foo');
     expect(target.get()[1]).toEqual('BAR');
@@ -121,6 +121,18 @@ describe('The MetricsTarget object', function() {
     expect(target.get()[2] === 'BAZ' || target.get()[3] === 'BAZ').toBe(true);
     expect(target.get()[2] === 'baz' || target.get()[3] === 'baz').toBe(true);
   });
+
+  it('rejects attempts to call tag() with multiple arguments (historically, this could be done, but is no longer supported and I want to fail-fast if it happens)', function() {
+    const target = MetricsTarget.create(merge);
+
+    const tag_identity = function(x) { return [x]; };
+    const tag_upper = function(x) { return [x.toUpperCase()]; };
+
+    expect(() => target.receiver().tag(tag_identity, tag_upper).receive('baz')).toThrow();
+
+    expect(target.get()).toEqual(null);
+  });
+
 
   it('can merge a lot of stuff', function() {
     const target = MetricsTarget.create(merge);
