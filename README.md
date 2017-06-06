@@ -154,7 +154,7 @@ the metrics as though get() had been called immediately before clearing.
 
 #### metrics.Target.MetricsTarget.get()
 
-Get the metrics currently stored in this MetricsTarget.
+Get the metrics currently stored in this MetricsTarget (as a Promise).
 
 #### metrics.Target.MetricsTarget.flush()
 

@@ -39,12 +39,11 @@ describe('The MetricsTarget object', function() {
     for( let i = 0; i < 10; i++ )
       receiver.receive(i); //this actually queues up 10 callbacks that should all fire at once . . .
 
-    Promise.resolve().then(() => {
-      expect(target.get()).toEqual([0,1,2,3,4,5,6,7,8,9]);
-      
-      return target.flush()
-        .then(x => expect(x).toEqual([0,1,2,3,4,5,6,7,8,9]));
-    }).then(done).catch(done.fail);
+    target.get()
+      .then(x => expect(x).toEqual([0,1,2,3,4,5,6,7,8,9]))
+      .then(() => target.flush())
+      .then(x => expect(x).toEqual([0,1,2,3,4,5,6,7,8,9]))
+      .then(done).catch(done.fail);
   });
 
   it('supports callbacks', function(done) {
@@ -58,54 +57,53 @@ describe('The MetricsTarget object', function() {
     const receiver = target.receiver().tag(x => [x]);
 
     for( let i = 0; i < 10; i++ )
-      receiver.receive(i); //this actually queues up 10 callbacks that should all fire at once . . .
+      receiver.receive(i);
 
-    Promise.resolve().then(() => {
-      expect(target.get()).toEqual([0,1,2,3,4,5,6,7,8,9]);
-      expect(n).toEqual(10);
-      
-      return target.flush()
-        .then(x => expect(x).toBe('hello, world'))
-        .then(() => expect(n).toBe(11));
-    }).then(done).catch(done.fail);
+    target.get()
+      .then(x => expect(x).toEqual([0,1,2,3,4,5,6,7,8,9]))
+      .then(() => target.flush())
+      .then(x => expect(x).toBe('hello, world'))
+      .then(() => expect(n).toBe(11))
+      .then(done).catch(done.fail);
   });
 
   it('supports creating MetricsReceivers', function() {
     expect(MetricsTarget.create(merge).receiver()).toBeDefined();
   });
 
-  it('supports merging one metrics object via a MetricsReceiver', function() {
+  it('supports merging one metrics object via a MetricsReceiver', function(done) {
     const target = MetricsTarget.create(merge);
     const receiver = target.receiver().tag(function(x) { return [x]; });
 
     receiver.receive(1);
 
-    expect(target.get()).toEqual([1]);
+    target.get().then(x => expect(x).toEqual([1])).then(done).catch(done.fail);
   });
 
-  it('supports a summarize() method on each sample and intersectional summaries', function() {
+  it('supports a summarize() method on each sample and intersectional summaries', function(done) {
     const target = MetricsTarget.create(merge);
     const receiver = target.receiver().tag(function(_x,x_summary) { return x_summary; });
 
     receiver.receive({ summarize: function() { return 2; } });
     receiver.receive({ summarize: function() { return 1; } });
 
-    expect(target.get()).toEqual(2);
+    target.get().then(x => expect(x).toEqual(2)).then(done).catch(done.fail);
   });
 
-  it('supports clearing and returning its current value', function() {
+  it('supports clearing and returning its current value', function(done) {
     const target = MetricsTarget.create(merge);
     const receiver = target.receiver().tag(function(x) { return [x]; });
 
     receiver.receive(1);
 
-    const value = target.clear();
-
-    expect(value).toEqual([1]);
-    expect(target.get()).toBe(null);
+    target.clear()
+      .then(x => expect(x).toEqual([1]))
+      .then(() => target.get())
+      .then(x => expect(x).toBe(null))
+      .then(done).catch(done.fail);
   });
 
-  it('supports chaining a tagged MetricsReceiver', function() {
+  it('supports chaining a tagged MetricsReceiver', function(done) {
     const target = MetricsTarget.create(merge);
 
     const tag_identity = function(x) { return [x]; };
@@ -115,14 +113,16 @@ describe('The MetricsTarget object', function() {
     target.receiver().tag(tag_upper).receive('bar');
     target.receiver().tag([tag_identity, tag_upper]).receive('baz');
 
-    expect(target.get()[0]).toEqual('foo');
-    expect(target.get()[1]).toEqual('BAR');
-    //iteration order is undefined . . .
-    expect(target.get()[2] === 'BAZ' || target.get()[3] === 'BAZ').toBe(true);
-    expect(target.get()[2] === 'baz' || target.get()[3] === 'baz').toBe(true);
+    target.get().then(x => {
+      expect(x[0]).toEqual('foo');
+      expect(x[1]).toEqual('BAR');
+      //iteration order is undefined . . .
+      expect(x[2] === 'BAZ' || x[3] === 'BAZ').toBe(true);
+      expect(x[2] === 'baz' || x[3] === 'baz').toBe(true);
+    }).then(done).catch(done.fail);
   });
 
-  it('rejects attempts to call tag() with multiple arguments (historically, this could be done, but is no longer supported and I want to fail-fast if it happens)', function() {
+  it('rejects attempts to call tag() with multiple arguments (historically, this could be done, but is no longer supported and I want to fail-fast if it happens)', function(done) {
     const target = MetricsTarget.create(merge);
 
     const tag_identity = function(x) { return [x]; };
@@ -130,11 +130,11 @@ describe('The MetricsTarget object', function() {
 
     expect(() => target.receiver().tag(tag_identity, tag_upper).receive('baz')).toThrow();
 
-    expect(target.get()).toEqual(null);
+    target.get().then(x => expect(x).toEqual(null)).then(done).catch(done.fail);
   });
 
 
-  it('can merge a lot of stuff', function() {
+  it('can merge a lot of stuff quickly', function(done) {
     const target = MetricsTarget.create(merge);
     const receiver = target.receiver().tag(function(x) { return x; });
 
@@ -142,10 +142,12 @@ describe('The MetricsTarget object', function() {
     for( let i = 0; i < 100000; i++ ) {
       receiver.receive(Math.random());
     }
-    const stop_time = Date.now();
 
-    expect(target.get()).toBeGreaterThan(0.9);
-    expect(target.get()).toBeLessThan(1.0);
-    expect(stop_time - start_time).toBeLessThan(1000*60);
+    target.get().then(x => {
+      const stop_time = Date.now();
+      expect(x).toBeGreaterThan(0.9);
+      expect(x).toBeLessThan(1.0);
+      expect(stop_time - start_time).toBeLessThan(1000*60);
+    }).then(done).catch(done.fail);
   });
 });

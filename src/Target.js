@@ -4,7 +4,7 @@ const immutable = require('immutable');
 
 const MetricsTarget = {
   _callback : target => target.get(),
-  _metrics : null,
+  _metrics : Promise.resolve(null),
   _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
   _type : 'legion-metrics/MetricsTarget'
 };
@@ -20,19 +20,15 @@ MetricsTarget.get = function() {
 };
 
 MetricsTarget.flush = function() {
-  return Promise.resolve(this)
-    .then(this._callback)
-    .catch(err => {
-      console.error('buggy callback attached to metrics target: ' + err); //eslint-disable-line no-console
-      throw err;
-    });
+  return this._metrics.then(() => this._callback(this)).catch(ex => {
+    console.error('buggy callback attached to metrics target: ' + ex); //eslint-disable-line no-console
+    throw ex;
+  });
 };
 
 MetricsTarget.clear = function() {
   const result = this._metrics;
-
-  this._metrics = null;
-
+  this._metrics = this._metrics.then(() => MetricsTarget._metrics);
   return result;
 };
 
@@ -49,7 +45,7 @@ MetricsReceiver.receive = function(sample) {
   });
 
   tagged_metrics.forEach((item_to_merge) => {
-    this._target._metrics = this._target._merge(this._target._metrics, item_to_merge);
+    this._target._metrics = this._target._metrics.then(m => this._target._merge(m, item_to_merge));
   });
 
   this._target.flush();
@@ -76,7 +72,7 @@ module.exports.create = function(merge, callback) {
 
   return Object.assign(Object.create(MetricsTarget), {
     _callback : callback ? callback : MetricsTarget._callback,
-    _metrics : null,
+    _metrics : MetricsTarget._metrics,
     _merge : merge.root.bind(merge)
   });
 };
