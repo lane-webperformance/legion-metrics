@@ -2,6 +2,12 @@
 
 const immutable = require('immutable');
 
+function immediately(pass_along_value) {
+  return new Promise(function(resolve) {
+    setImmediate(resolve, pass_along_value);
+  });
+}
+
 const MetricsTarget = {
   _callback : target => target.get(),
   _metrics : Promise.resolve(null),
@@ -39,13 +45,19 @@ const MetricsReceiver = {
 };
 
 MetricsReceiver.receive = function(sample) {
-  const sample_summary = sample.summarize ? sample.summarize() : {};
-  const tagged_metrics = this._tags.map(function(tag) {
-    return tag(sample, sample_summary);
-  });
+  this._target._metrics = this._target._metrics.then(immediately).then(m => {
+    const sample_summary = sample.summarize ? sample.summarize() : {};
+    const tagged_metrics = this._tags.map(function(tag) {
+      return tag(sample, sample_summary);
+    });
 
-  tagged_metrics.forEach((item_to_merge) => {
-    this._target._metrics = this._target._metrics.then(m => this._target._merge(m, item_to_merge));
+    m = Promise.resolve(m);
+
+    tagged_metrics.forEach((item_to_merge) => {
+      m = m.then(immediately).then(m => this._target._merge(m, item_to_merge));
+    });
+
+    return m;
   });
 
   this._target.flush();

@@ -139,7 +139,7 @@ describe('The MetricsTarget object', function() {
     const receiver = target.receiver().tag(function(x) { return x; });
 
     const start_time = Date.now();
-    for( let i = 0; i < 100000; i++ ) {
+    for( let i = 0; i < 10000; i++ ) {
       receiver.receive(Math.random());
     }
 
