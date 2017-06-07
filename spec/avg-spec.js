@@ -13,18 +13,12 @@ describe('The average merge operator', function() {
 
       list.push(x);
       list.push(y);
-
-      if( i % 10000 === 0 )
-        console.log(2*i);
     }
 
     let running_average = avg.singleton(list.pop());
 
-    while( list.length > 0 ) {
+    while( list.length > 0 )
       running_average = avg(running_average, avg.singleton(list.pop()));
-      if( list.length % 10000 === 0 )
-        console.log(list.length);
-    }
 
     expect(running_average.avg).toBeGreaterThan(0.499);
     expect(running_average.avg).toBeLessThan(0.501);

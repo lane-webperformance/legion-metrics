@@ -1,12 +1,7 @@
 'use strict';
 
 const immutable = require('immutable');
-
-function immediately(pass_along_value) {
-  return new Promise(function(resolve) {
-    setImmediate(resolve, pass_along_value);
-  });
-}
+const throttle = require('./throttle');
 
 const MetricsTarget = {
   _callback : target => target.get(),
@@ -45,7 +40,7 @@ const MetricsReceiver = {
 };
 
 MetricsReceiver.receive = function(sample) {
-  this._target._metrics = this._target._metrics.then(immediately).then(m => {
+  this._target._metrics = this._target._metrics.then(throttle).then(m => {
     const sample_summary = sample.summarize ? sample.summarize() : {};
     const tagged_metrics = this._tags.map(function(tag) {
       return tag(sample, sample_summary);
@@ -54,7 +49,7 @@ MetricsReceiver.receive = function(sample) {
     m = Promise.resolve(m);
 
     tagged_metrics.forEach((item_to_merge) => {
-      m = m.then(immediately).then(m => this._target._merge(m, item_to_merge));
+      m = m.then(throttle).then(m => this._target._merge(m, item_to_merge));
     });
 
     return m;
