@@ -21,7 +21,7 @@ MetricsTarget.get = function() {
 };
 
 MetricsTarget.flush = function() {
-  return this._metrics.then(() => this._callback(this)).catch(ex => {
+  return Promise.resolve(this).then(this._callback).catch(ex => {
     console.error('buggy callback attached to metrics target: ' + ex); //eslint-disable-line no-console
     throw ex;
   });
