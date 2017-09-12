@@ -1,12 +1,14 @@
 'use strict';
 
+const reservoir = require('../merge/reservoir');
+
 const Problem = {};
 
 Problem.summarize = function() {
   return {
     problems : {
       problems$sum : 1,
-      problems$events : [JSON.parse(JSON.stringify(this))],
+      problems$reservoir : reservoir.singleton(JSON.parse(JSON.stringify(this))),
       time$min : this.time,
       time$max : this.time
     }

@@ -5,90 +5,88 @@ Error.stackTraceLimit=Infinity;
 require('jasmine-immutablejs-matchers');
 
 const merge = require('../src/index').merge;
-const immutable = require('immutable');
 
 describe('The sum metrics operation', function() {
   it('can merge numerical values', function() {
-    expect(merge.sum(5,7)).toBe(12);
-    expect(merge.min(5,7)).toBe(5);
-    expect(merge.max(5,7)).toBe(7);
-    expect(merge.avg(merge.avg.singleton(5),merge.avg.singleton(7)).avg).toBe(6);
-    expect(merge.avg(merge.avg.singleton(5),merge.avg.singleton(7)).size).toBe(2);
-  });
-
-  it('does not allow non-numerical values', function() {
-    expect(function() { return merge.sum('two',3); }).toThrow();
-    expect(function() { return merge.min('two',3); }).toThrow();
-    expect(function() { return merge.max('two',3); }).toThrow();
-    expect(function() { return merge.sum(2,'three'); }).toThrow();
-    expect(function() { return merge.min(2,'three'); }).toThrow();
-    expect(function() { return merge.max(2,'three'); }).toThrow();
-    expect(function() { return merge.avg(merge.avg.singleton(2),merge.avg.singleton('three')); }).toThrow();
+    expect(merge.algorithm({$sum:5},{$sum:7})).toEqual({$sum:12});
+    expect(merge.algorithm({$min:5},{$min:7})).toEqual({$min:5});
+    expect(merge.algorithm({$max:5},{$max:7})).toEqual({$max:7});
+    expect(merge.algorithm({$avg:merge.avg.singleton(5)},{$avg:merge.avg.singleton(7)})).toEqual({$avg:{avg:6,size:2}});
   });
 });
 
 describe('The merge metrics operations', function() {
-  it('can merge sets and event streams', function() {
-    expect(merge.events([100,200,300],[400,500,600])).toEqual(immutable.Set([100,200,300,400,500,600]));
-  });
-
   it('can merge homogenous objects', function() {
     const sample_1 = {
       '$min': 5,
       '$max': 5,
       '$avg': merge.avg.singleton(5),
       'total$sum': 5,
-      'count$sum': 1,
-      '$events': [5] };
+      'count$sum': 1 };
 
     const sample_2 = {
       '$min': 3,
       '$max': 3,
       '$avg': merge.avg.singleton(3),
       'total$sum': 3,
-      'count$sum': 1,
-      '$events': [3] };
+      'count$sum': 1 };
 
-    const result = merge.object(sample_1, sample_2);
+    const result = merge.algorithm(sample_1, sample_2);
 
-    expect(JSON.parse(JSON.stringify(result))).toEqual({
+    expect(result).toEqual({
       '$min': 3,
       '$max': 5,
       '$avg' : { avg: 4, size: 2 },
       'total$sum': 8,
-      'count$sum': 2,
-      '$events': [5,3]});
+      'count$sum': 2 });
   });
 
   it('can merge heterogenous objects', function() {
     const sample_1 = {
       'data': { '$min': 3, '$max': 5 },
-      '$events': ['foo','bar','baz'] };
+      '$sum': -1 };
 
     const sample_2 = {
-      'avg': { 'total$sum': 100, 'count$sum': 5 },
-      '$events': ['quux'] };
+      'ok': { '$sum': 2 },
+      '$sum': 1 };
 
     const sample_3 = {
       'data': { '$sum': 20 } };
 
-    let result = merge.object(sample_1, sample_2);
-    result = merge.object(result, sample_3);
+    let result = merge.algorithm(sample_1, sample_2);
+    result = merge.algorithm(result, sample_3);
 
-    expect(result).toEqualImmutable(immutable.Map({
-      'data': immutable.Map({ '$min': 3, '$max': 5, '$sum' : 20 }),
-      'avg': sample_2.avg,
-      '$events': immutable.Set(['foo','bar','baz','quux']) }));
+    expect(result).toEqual({
+      'data': { '$min': 3, '$max': 5, '$sum' : 20 },
+      'ok': { '$sum': 2 },
+      '$sum': 0});
   });
 
-  it('has a root merger method that DTRTs based on the type of the input', function() {
-    const sample_1 = { 'foo$set': immutable.Set(['bar']) };
-    const sample_2 = { 'foo$set': immutable.Set(['baz']) };
+  it('can merge arbitrarily large arrays into randomly selected samples', function() {
+    function makeHugeArray() {
+      const result = [];
+      for( let i = 0; i < 10000; i++ )
+        result.push(i);
+      return result;
+    }
 
-    expect(merge.root(sample_1,sample_2)).toEqualImmutable(immutable.Map({
-      'foo$set': immutable.Set(['bar','baz'])}));
+    const sample_1 = { 'foo$reservoir': merge.reservoir.set(['foo','bar']) };
+    const sample_2 = { 'foo$reservoir': merge.reservoir.singleton('baz') };
+    const sample_3 = { 'foo$reservoir': merge.reservoir.set(makeHugeArray()) };
 
-    expect(merge.root(null, sample_2)).toEqualImmutable(immutable.Map({
-      'foo$set': immutable.Set(['baz'])}));
+    console.log('This is an example of a reservoir: ' + JSON.stringify(sample_1)); // eslint-disable-line no-console
+    console.log('This is an example of the result of merging to reservoirs: ' + JSON.stringify((merge.algorithm(sample_1,sample_2)))); // eslint-disable-line no-console
+    expect(merge.algorithm(sample_1,sample_2).foo$reservoir.population_size).toEqual(3);
+    expect(merge.reservoir.get(merge.algorithm(sample_1,sample_2).foo$reservoir).reserve.sort()).toEqual(['bar','baz','foo']);
+    expect(merge.reservoir.get(merge.algorithm(sample_1,sample_2).foo$reservoir).population_size).toEqual(3);
+
+    expect(merge.reservoir.get(merge.algorithm(null, sample_2).foo$reservoir)).toEqual({
+      reserve: ['baz'],
+      population_size: 1
+    });
+
+    expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).population_size).toEqual(10002);
+    expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeLessThan(200);
+    expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeGreaterThan(100);
   });
 });

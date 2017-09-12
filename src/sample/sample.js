@@ -1,6 +1,7 @@
 'use strict';
 
 const avg = require('../merge/avg');
+const reservoir = require('../merge/reservoir');
 
 const Sample = {};
 
@@ -17,8 +18,8 @@ Sample.summarize = function() {
       $max : v,
       $min : v,
       $avg : avg.singleton(v),
-      unit$set : [this.values[k].unit],
-      interpretation$set : [this.values[k].interpretation]
+      unit$reservoir : reservoir.singleton(this.values[k].unit),
+      interpretation$reservoir : reservoir.singleton(this.values[k].interpretation)
     };});
 
   return { values : result };

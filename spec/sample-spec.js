@@ -29,8 +29,8 @@ describe('The sample function', function() {
     expect(s.summarize().values.timestamp.$min).toBe(1000000);
     expect(s.summarize().values.timestamp.$max).toBe(1000000);
 
-    expect(s.summarize().values.kittens.unit$set).toEqual(['felines']);
-    expect(s.summarize().values.kittens.interpretation$set).toEqual(['number of kittens in household']);
+    expect(s.summarize().values.kittens.unit$reservoir.reserve[0].value).toEqual('felines');
+    expect(s.summarize().values.kittens.interpretation$reservoir.reserve[0].value).toEqual('number of kittens in household');
   });
 
   it('returns a sample event', function() {

@@ -10,52 +10,43 @@ metrics from a load test.
 metrics.merge
 -------------
 
-A dictionary of rules for merging two different pieces of data.
+### metrics.merge.algorithm(l : any, r : any)
 
-### metrics.merge.avg(l : number, r : number)
+Implements the legion merge algorithm.
 
-A merge rule that computes the average two values, internally stored as
-{ avg, size }.
+Typically, this merges two plain javascript objects by recursively merging their
+members. The merge rule that should be chosen for each member is defined by the
+part of the member's name after the '$' sign. If there is no '$' sign then the
+default rule is used.
 
-#### metrics.merge.avg.singleton()
+The following merge rules are available:
 
-To construct an avg object that can be merged with metrics.merge.avg.
+ * avg: { avg : number, size : integer } + { avg : number, size : integer } -> { avg : number, size : integer }
+ * max: number + number -> number
+ * min: number + number -> number
+ * reservoir: { reserve : [any], population\_size : integer } + { reserve : [any], population\_size : integer } -> { reserve : [any], population\_size : integer }
+ * sum: number + number -> number
 
-### metrics.merge.events(l : array, r : array)
+### metrics.merge.avg.singleton(n : number)
 
-See: merge.set
+Returns an average object suitable for the merge algorithm.
 
-### metrics.merge.max(l : number, r : number)
+### metrics.merge.reservoir.singleton(a : any)
 
-A merge rule that takes the maximum of two values.
+Puts any object in a reservoir suitable for the merge algorithm.
 
-### metrics.merge.min(l : number, r : number)
+### metrics.merge.reservoir.set(as : [any])
 
-A merge rule that takes the minimum of two values.
+Puts a set of any objects in a reservoir suitable for the merge algorithm.
 
-### metrics.merge.mustMatch(l : any, r : any)
+### metrics.merge.reservoir.get(reservoir : { object })
 
-A merge rule that will throw an error if every value is not equal. This is a
-to ensure that incompatible groups of data will not be merged to create a
-misleading result.
+Unpacks a reservoir in an object with fields:
 
-### metrics.merge.object(l : object, r : object)
+ * reserve : an array representing a randomly selected sub-set of the objects originally put into the reservoir
+ * population\_size : the total population size represented by the reserve
 
-Merges two objects by recursively merging their members. The merge rule that
-should be chosen for each member is defined by the part of the member's name
-after the '$' sign.
-
-Internally, objects are merged as [immutable]
-(https://facebook.github.io/immutable-js/docs/#/) maps.
-
-### metrics.merge.set(l : array, r : array)
-
-Merges two arrays, removing duplicates. Internally, sets are merged
-as immutable sets.
-
-### metrics.merge.sum(l : number, r : number)
-
-A merge rule that takes the sum of two values.
+Important: once you remove objects from a reservoir, you can not then put them into another reservoir. If you do so, you will not get an error, but the result will not be statistically representative.
 
 metrics.problem(error : Error, details : object)
 ---------------------------------
