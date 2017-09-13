@@ -3,7 +3,7 @@
 const MetricsTarget = require('../src/index').Target;
 
 const merge = {
-  'root' : function(a,b) {
+  'algorithm' : function(a,b) {
     if( a === null )
       return b;
     if( typeof a === 'number' )
@@ -29,6 +29,7 @@ describe('The MetricsTarget object', function() {
 
   it('supports a create() operation', function() {
     expect(MetricsTarget.create(merge)).toBeDefined();
+    expect(MetricsTarget.create(merge.algorithm)).toBeDefined();
     expect(function() { return MetricsTarget.create(); }).toThrow();
   });
 
@@ -82,6 +83,16 @@ describe('The MetricsTarget object', function() {
 
   it('supports a summarize() method on each sample and intersectional summaries', function(done) {
     const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(_x,x_summary) { return x_summary; });
+
+    receiver.receive({ summarize: function() { return 2; } });
+    receiver.receive({ summarize: function() { return 1; } });
+
+    target.get().then(x => expect(x).toEqual(2)).then(done).catch(done.fail);
+  });
+
+  it('supports a summarize() method on each sample and intersectional summaries (initializing with merge.algorithm instead of merge)', function(done) {
+    const target = MetricsTarget.create(merge.algorithm);
     const receiver = target.receiver().tag(function(_x,x_summary) { return x_summary; });
 
     receiver.receive({ summarize: function() { return 2; } });

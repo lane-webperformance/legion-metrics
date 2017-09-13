@@ -70,9 +70,12 @@ MetricsReceiver.tag = function(tag_or_tags) {
   });
 };
 
-module.exports.create = function(merge, callback) {
-  if( typeof merge !== 'object' )
-    throw new Error('MetricsTarget.create(merge): merge must be a merging rule table');
+module.exports.create = function(algorithm, callback) {
+  if( algorithm.algorithm )
+    algorithm = algorithm.algorithm.bind(algorithm);
+
+  if( typeof algorithm !== 'function' )
+    throw new Error('MetricsTarget.create(merge): must provide a metrics merge algorithm (usually require("legion-metrics").merge.algorithm');
 
   if( callback && typeof callback !== 'function' )
     throw new Error('MetricsTarget.create(merge,callback): callback must be a function');
@@ -80,7 +83,7 @@ module.exports.create = function(merge, callback) {
   return Object.assign(Object.create(MetricsTarget), {
     _callback : callback ? callback : MetricsTarget._callback,
     _metrics : MetricsTarget._metrics,
-    _merge : merge.root.bind(merge)
+    _merge : algorithm
   });
 };
 
