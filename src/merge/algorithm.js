@@ -98,9 +98,6 @@ module.exports = function(a,b) {
       assertNumber(a.population_size);
       assertNumber(b.population_size);
 
-      const existing_values = a.reserve.map(x => x.value);
-      b.reserve = b.reserve.filter(x => !existing_values.includes(x.value));
-
       const MULTIPLE = 10; // multiple arbitrarily selected to balance user comfort -vs- scalability needs
       const result = {
         reserve : [].concat(a.reserve,b.reserve),
@@ -110,6 +107,20 @@ module.exports = function(a,b) {
       const sample_size = Math.round(MULTIPLE*Math.log(result.population_size+1)/Math.log(2));
       result.reserve.sort((x,y) => x.key - y.key);
       result.reserve.length = Math.min(result.reserve.length,sample_size);
+
+      const seen = [];
+      for( const i in result.reserve ) {
+        if( typeof result.reserve[i] === 'object' )
+          continue;  // not worth running an n^2 algorithm on something that will mostly never happen
+                     // alternately, if we're nubbing strings, they're probably all the same and this running in constant time
+
+        if( seen.includes(result.reserve[i].value) )
+          result.reserve[i] = null;
+        else
+          seen.push(result.reserve[i].value);
+      }
+
+      result.reserve = result.reserve.filter(x => x !== null);
 
       return result;
     }
