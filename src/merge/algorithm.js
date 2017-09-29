@@ -41,6 +41,28 @@ module.exports = function(a,b) {
     return op.call(available_operations,a,b);
   };
 
+  const removeDuplicates = function(xs) {
+    const seen = [];
+    const result = [];
+
+    for( const i in xs ) {
+      if( typeof xs[i].value === 'object' ) {
+        result.push(xs[i]);
+        continue;  // not worth running an n^2 algorithm on something that will mostly never happen
+                   // alternately, if we're nubbing strings, they're probably all the same and this is running in constant time
+                   // why would we have a reservoir of any other type?
+      }
+
+      if( !seen.includes(xs[i].value) ) {
+        seen.push(xs[i].value);
+        result.push(xs[i]);
+      }
+    }
+
+    return result;
+  };
+
+
   // Table of merge rules.
   const merge_rules = {
     // Merges a running average of two samples
@@ -105,22 +127,9 @@ module.exports = function(a,b) {
       };
 
       const sample_size = Math.round(MULTIPLE*Math.log(result.population_size+1)/Math.log(2));
-      result.reserve.sort((x,y) => x.key - y.key);
+      result.reserve.sort((x,y) => y.key - x.key);
       result.reserve.length = Math.min(result.reserve.length,sample_size);
-
-      const seen = [];
-      for( const i in result.reserve ) {
-        if( typeof result.reserve[i] === 'object' )
-          continue;  // not worth running an n^2 algorithm on something that will mostly never happen
-                     // alternately, if we're nubbing strings, they're probably all the same and this running in constant time
-
-        if( seen.includes(result.reserve[i].value) )
-          result.reserve[i] = null;
-        else
-          seen.push(result.reserve[i].value);
-      }
-
-      result.reserve = result.reserve.filter(x => x !== null);
+      result.reserve = removeDuplicates(result.reserve);
 
       return result;
     }

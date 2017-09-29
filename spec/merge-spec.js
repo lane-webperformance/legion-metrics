@@ -85,6 +85,9 @@ describe('The merge metrics operations', function() {
       population_size: 1
     });
 
+    // Checking that keys are actually sorted from largest to smallest, by checking what should be the largest of 10000 keys
+    expect(merge.algorithm(sample_3, sample_3).foo$reservoir.reserve[0].key).toBeGreaterThan(0.9);
+
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).population_size).toEqual(10002);
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeLessThan(200);
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeGreaterThan(100);
