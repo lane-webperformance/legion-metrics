@@ -62,7 +62,7 @@ describe('The merge metrics operations', function() {
       '$sum': 0});
   });
 
-  it('can merge arbitrarily large arrays into randomly selected samples', function() {
+  it('can merge arbitrarily large arrays into randomly selected samples (known as a reservoir)', function() {
     function makeHugeArray() {
       const result = [];
       for( let i = 0; i < 10000; i++ )
@@ -75,7 +75,7 @@ describe('The merge metrics operations', function() {
     const sample_3 = { 'foo$reservoir': merge.reservoir.set(makeHugeArray()) };
 
     console.log('This is an example of a reservoir: ' + JSON.stringify(sample_1)); // eslint-disable-line no-console
-    console.log('This is an example of the result of merging to reservoirs: ' + JSON.stringify((merge.algorithm(sample_1,sample_2)))); // eslint-disable-line no-console
+    console.log('This is an example of the result of merging two reservoirs: ' + JSON.stringify((merge.algorithm(sample_1,sample_2)))); // eslint-disable-line no-console
     expect(merge.algorithm(sample_1,sample_2).foo$reservoir.population_size).toEqual(3);
     expect(merge.reservoir.get(merge.algorithm(sample_1,sample_2).foo$reservoir).reserve.sort()).toEqual(['bar','baz','foo']);
     expect(merge.reservoir.get(merge.algorithm(sample_1,sample_2).foo$reservoir).population_size).toEqual(3);
@@ -88,5 +88,16 @@ describe('The merge metrics operations', function() {
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).population_size).toEqual(10002);
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeLessThan(200);
     expect(merge.reservoir.get(merge.algorithm(sample_1, sample_3)['foo$reservoir']).reserve.length).toBeGreaterThan(100);
+  });
+
+  it('can generally eliminate duplicates from reservoirs', function() {
+    let result = null;
+
+    for( let i = 0; i < 10000; i++ )
+      result = merge.algorithm(result, { 'foo$reservoir': merge.reservoir.singleton(Math.random() < 0.1 ? 'foo' : 'bar') });
+
+    expect(merge.reservoir.get(result['foo$reservoir']).population_size).toEqual(10000);
+    expect(merge.reservoir.get(result['foo$reservoir']).reserve.length).toBe(2);
+    expect(merge.reservoir.get(result.foo$reservoir).reserve.sort()).toEqual(['bar','foo']);
   });
 });

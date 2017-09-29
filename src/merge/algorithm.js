@@ -98,6 +98,9 @@ module.exports = function(a,b) {
       assertNumber(a.population_size);
       assertNumber(b.population_size);
 
+      const existing_values = a.reserve.map(x => x.value);
+      b.reserve = b.reserve.filter(x => !existing_values.includes(x.value));
+
       const MULTIPLE = 10; // multiple arbitrarily selected to balance user comfort -vs- scalability needs
       const result = {
         reserve : [].concat(a.reserve,b.reserve),
