@@ -236,7 +236,3 @@ Equivalent to metrics.tags.generic('step').
 Constructs a tag to instrument the completion of a user-defined step as a whole.
 Equivalent to metrics.tags.generic('stepCompletion').
 
-#### metrics.raw
-
-The raw tag. This tag captures all samples, not just sample summary statistics.
-

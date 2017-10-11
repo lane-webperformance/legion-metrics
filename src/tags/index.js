@@ -22,5 +22,3 @@ module.exports.testcaseCompletion = module.exports.generic('testcaseCompletion')
 
 module.exports.section = module.exports.generic('section');
 module.exports.sectionCompletion = module.exports.generic('sectionCompletion');
-
-module.exports.raw = require('./raw');

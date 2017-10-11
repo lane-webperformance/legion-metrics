@@ -6,6 +6,7 @@ const throttle = require('./throttle');
 const MetricsTarget = {
   _callback : target => target.get(),
   _metrics : Promise.resolve(null),
+  _problems : 0,
   _merge : function() { throw new Error('MetricsTarget._merge: not defined'); },
   _type : 'legion-metrics/MetricsTarget'
 };
@@ -30,13 +31,26 @@ MetricsTarget.flush = function() {
 MetricsTarget.clear = function() {
   const result = this._metrics;
   this._metrics = this._metrics.then(() => MetricsTarget._metrics);
+
+  if( this._problems )
+    console.error('MetricsTarget.clear(): cleared ' + this._problems + ' problems.'); //eslint-disable-line no-console
+  this._problems = MetricsTarget._problems;
+
   return result;
+};
+
+MetricsTarget.getProblemCount = function() {
+  return this._problems;
 };
 
 const MetricsReceiver = {
   _target : undefined,
   _tags : immutable.Set(),
   _type : 'legion-metrics/MetricsReceiver'
+};
+
+MetricsReceiver.incrementProblems = function() {
+  this._target._problems++;
 };
 
 MetricsReceiver.receive = function(sample) {

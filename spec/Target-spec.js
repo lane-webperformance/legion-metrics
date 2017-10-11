@@ -161,4 +161,19 @@ describe('The MetricsTarget object', function() {
       expect(stop_time - start_time).toBeLessThan(1000*60);
     }).then(done).catch(done.fail);
   });
+
+  it('maintains a problem counter', function() {
+    const target = MetricsTarget.create(merge);
+    const receiver = target.receiver().tag(function(x) { return x; });
+
+    receiver.receive(Math.random());
+    receiver.receive(Math.random());
+    receiver.receive(Math.random());
+    receiver.incrementProblems();
+    receiver.incrementProblems();
+    receiver.receive(Math.random());
+    receiver.incrementProblems();
+
+    expect(target.getProblemCount()).toBe(3);
+  });
 });

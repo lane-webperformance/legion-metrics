@@ -11,6 +11,7 @@ Problem.summarize = function() {
       problems$reservoir : reservoir.singleton(JSON.parse(JSON.stringify(this))),
       time$min : this.time,
       time$max : this.time
+      //TODO: hash problems by stack trace?
     }
   };
 };
