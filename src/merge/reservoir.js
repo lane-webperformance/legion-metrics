@@ -3,6 +3,9 @@
 const R = require('ramda');
 
 module.exports.get = function(summary) {
+  if( !summary )
+    return { reserve : [], population_size: 0 };
+
   return {
     reserve : R.uniq(summary.reserve.map(x => x.value)),
     population_size : summary.population_size

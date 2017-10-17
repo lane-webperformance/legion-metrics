@@ -6,3 +6,4 @@ module.exports.sample  = require('./sample/sample');
 module.exports.problem = require('./sample/problem');
 module.exports.summary = require('./sample/summary');
 module.exports.tags    = require('./tags');
+module.exports.unmerge = require('./unmerge');
