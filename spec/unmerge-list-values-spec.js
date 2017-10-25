@@ -2,7 +2,7 @@
 
 const reservoir = require('../src/merge/reservoir');
 const avg = require('../src/merge/avg');
-const listValues = require('../src/unmerge/list-values');
+const listValues = require('../src/unmerge/listValues');
 
 describe('unmerge.listValues', function() {
   it('Breaks down blobs of summary metrics into a table of values', function() {

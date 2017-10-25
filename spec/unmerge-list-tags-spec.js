@@ -1,6 +1,6 @@
 'use strict';
 
-const listTags = require('../src/unmerge/list-tags');
+const listTags = require('../src/unmerge/listTags');
 
 describe('unmerge.listTags', function() {
   it('Breaks down blobs of summary metrics into a table of tags', function() {

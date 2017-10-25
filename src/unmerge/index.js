@@ -1,4 +1,6 @@
 'use strict';
 
-module.exports.listTags = require('./list-tags');
-module.exports.listValues = require('./list-values');
+module.exports.listTags = require('./listTags');
+module.exports.listValues = require('./listValues');
+module.exports.toTable = require('./toTable');
+module.exports.toCsv = require('./toCsv');
