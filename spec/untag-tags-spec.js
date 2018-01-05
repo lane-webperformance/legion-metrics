@@ -1,6 +1,6 @@
 'use strict';
 
-const unmerge = require('../src/unmerge');
+const untag = require('../src/untag');
 
 describe('unmerge.tags', function() {
   it('breaks down axis and tag names', function() {
@@ -25,8 +25,9 @@ describe('unmerge.tags', function() {
       }
     };
 
-    expect(unmerge.tags(summary).axisNames()).toEqual(['outcome','protocol']);
-    expect(unmerge.tags(summary).axis('outcome').tagNames()).toEqual(['success','failure']);
-    expect(unmerge.tags(summary).axis('protocol').tagNames()).toEqual(['http','ssh']);
+    expect(untag(summary).axisNames()).toEqual(['outcome','protocol']);
+    expect(untag(summary).axis('outcome').tagNames()).toEqual(['success','failure']);
+    expect(untag(summary).axis('protocol').tagNames()).toEqual(['http','ssh']);
+    expect(untag(summary).axis('protocol').tag('http').path()).toEqual(['tags','protocol','http']);
   });
 });

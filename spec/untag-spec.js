@@ -2,34 +2,53 @@
 
 const reservoir = require('../src/merge/reservoir');
 const avg = require('../src/merge/avg');
-const unmerge = require('../src/unmerge');
+const untag = require('../src/untag');
 
 describe('unmerge', function() {
   it('allows chaining queries to the point of finding a specific value of a specific tag', function() {
     const summary = {
-      tags: {
-        outcome: {
-          success: {
-            values: {
-              woof: {
-                $min: 2,
-                $avg: avg.singleton(2),
-                $max: 2,
-                unit$reservoir: reservoir.singleton('barks'),
-                interpretation$reservoir: reservoir.singleton('amount of noise made by puppies')
+      data: {
+        in_a_weird_place: {
+          tags: {
+            outcome: {
+              success: {
+                values: {
+                  woof: {
+                    $min: 2,
+                    $avg: avg.singleton(2),
+                    $max: 2,
+                    unit$reservoir: reservoir.singleton('barks'),
+                    interpretation$reservoir: reservoir.singleton('amount of noise made by puppies')
+                  }
+                },
+                tags: {
+                  protocol: {
+                    http: {
+                      values: {
+                        meow: {
+                          $min: 10,
+                          $avg: avg.singleton(10),
+                          $max: 10,
+                          unit$reservoir: reservoir.singleton('millimews'),
+                          interpretation$reservoir: reservoir.singleton('amount of noise made by kitties')
+                        }
+                      }
+                    }
+                  }
+                }
               }
-            }
-          }
-        },
-        protocol: {
-          http: {
-            values: {
-              meow: {
-                $min: 10,
-                $avg: avg.singleton(10),
-                $max: 10,
-                unit$reservoir: reservoir.singleton('millimews'),
-                interpretation$reservoir: reservoir.singleton('amount of noise made by kitties')
+            },
+            protocol: {
+              http: {
+                values: {
+                  meow: {
+                    $min: 10,
+                    $avg: avg.singleton(10),
+                    $max: 10,
+                    unit$reservoir: reservoir.singleton('millimews'),
+                    interpretation$reservoir: reservoir.singleton('amount of noise made by kitties')
+                  }
+                }
               }
             }
           }
@@ -37,7 +56,17 @@ describe('unmerge', function() {
       }
     };
 
-    expect(unmerge.tags(summary).axisNames()).toEqual(['outcome','protocol']);
-    expect(unmerge.tags(summary).axis('protocol').tag('http').value('meow').average()).toEqual(10);
+    const query = untag(summary, ['data', 'in_a_weird_place']);
+
+    expect(query.axisNames()).toEqual(['outcome','protocol']);
+    expect(query.axis('protocol').tag('http').value('meow').average()).toEqual(10);
+    expect(query.axis('outcome').tag('success').axisNames()).toEqual(['protocol']);
+    expect(query.axis('outcome').tag('success').axis('protocol').tagNames()).toEqual(['http']);
+    expect(query.axis('outcome').tag('success').axis('protocol').tag('http').path()).toEqual(['data','in_a_weird_place','tags','outcome','success','tags','protocol','http']);
+    expect(query.axis('outcome').tag('success').blob()).toBe(summary.data.in_a_weird_place.tags.outcome.success);
+    expect(query.axis('outcome').tag('success').toString()).toEqual('outcome:success');
+    expect(query.axis('outcome').tag('success').axisName()).toEqual('outcome');
+    expect(query.axis('outcome').tag('success').tagName()).toEqual('success');
+    expect(query.axis('outcome').tag('success').valueNames()).toEqual(['woof']);
   });
 });
