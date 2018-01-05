@@ -2,10 +2,10 @@
 
 const reservoir = require('../src/merge/reservoir');
 const avg = require('../src/merge/avg');
-const listValues = require('../src/unmerge/list-values');
+const unmerge = require('../src/unmerge');
 
-describe('unmerge.listValues', function() {
-  it('Breaks down blobs of summary metrics into a table of values', function() {
+describe('unmerge', function() {
+  it('allows chaining queries to the point of finding a specific value of a specific tag', function() {
     const summary = {
       tags: {
         outcome: {
@@ -37,10 +37,7 @@ describe('unmerge.listValues', function() {
       }
     };
 
-    expect(listValues(summary).foo).not.toBeDefined();
-    expect(listValues(summary).woof).toBeDefined();
-    expect(Array.from(listValues(summary).woof.unit)).toEqual(['barks']);
-    expect(Array.from(listValues(summary).meow.unit)).toEqual(['millimews']);
-    expect(Array.from(listValues(summary).meow.interpretation)).toEqual(['amount of noise made by kitties']);
+    expect(unmerge.tags(summary).axisNames()).toEqual(['outcome','protocol']);
+    expect(unmerge.tags(summary).axis('protocol').tag('http').value('meow').average()).toEqual(10);
   });
 });
