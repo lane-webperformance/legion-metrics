@@ -14,6 +14,9 @@ module.exports = function(root_blob, prefix_path) {
   const query = {
     axisNames: () => Object.keys(blob.tags),
     axis: (axis_name) => Object.assign({
+      toString: function() {
+        return axis_name;
+      },
       axisName: function() {
         return axis_name;
       },
