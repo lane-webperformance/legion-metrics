@@ -12,10 +12,18 @@ module.exports = function(root_blob, prefix_path) {
     throw new Error('not a tags object (no blob.tags field)');
 
   const query = Object.assign({}, require('./path_mixins'), {
-    axisNames: () => Object.keys(blob.tags),
-    axes: () => query.axisNames().map(axis_name => query.axis(axis_name)),
-    tags: () => query.axes().map(axis => axis.tags())
-      .reduce((xs,xss) => { xss.push(...xs); return xss; },[]),
+    axisNames: function() {
+      return Object.keys(blob.tags);
+    },
+    axes: function() {
+      return query.axisNames().map(axis_name => query.axis(axis_name));
+    },
+    tags: function() {
+      return query.axes().map(axis => axis.tags()).reduce((xs,xss) => { xss.push(...xs); return xss; },[]);
+    },
+    path: function() {
+      return prefix_path;
+    },
     axis: (axis_name) => Object.assign({}, require('./path_mixins'), {
       toString: function() {
         return axis_name;

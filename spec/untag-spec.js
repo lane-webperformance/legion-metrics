@@ -77,6 +77,7 @@ describe('unmerge', function() {
 
     expect(query.axis('outcome').pathPrefixOf(query.axis('outcome'))).toBe(true);
     expect(!query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome'))).toBe(true);
+    expect(!query.axis('outcome').tag('success').pathPrefixOf(query)).toBe(true);
     expect(query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome').tag('success').axis('protocol'))).toBe(true);
     expect(query.axis('outcome').tag('success').axis('protocol').pathPrefixOf(query.axis('outcome').tag('success').axis('protocol').tag('http'))).toBe(true);
     expect(query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome').tag('success').value('woof'))).toBe(true);
