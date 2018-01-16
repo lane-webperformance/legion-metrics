@@ -11,9 +11,12 @@ module.exports = function(root_blob, prefix_path) {
   if( !blob.tags )
     throw new Error('not a tags object (no blob.tags field)');
 
-  const query = {
+  const query = Object.assign({}, require('./path_mixins'), {
     axisNames: () => Object.keys(blob.tags),
-    axis: (axis_name) => Object.assign({
+    axes: () => query.axisNames().map(axis_name => query.axis(axis_name)),
+    tags: () => query.axes().map(axis => axis.tags())
+      .reduce((xs,xss) => { xss.push(...xs); return xss; },[]),
+    axis: (axis_name) => Object.assign({}, require('./path_mixins'), {
       toString: function() {
         return axis_name;
       },
@@ -29,7 +32,7 @@ module.exports = function(root_blob, prefix_path) {
       tagNames: function() {
         return Object.keys(blob.tags[axis_name]);
       },
-      tag: (tag_name) => Object.assign({
+      tag: (tag_name) => Object.assign({}, require('./path_mixins'), {
         toString: function() {
           return axis_name + ':' + tag_name;
         },
@@ -73,11 +76,8 @@ module.exports = function(root_blob, prefix_path) {
           return this.subtagsQuery().axis(x);
         }
       })
-    }),
-    axes: () => query.axisNames().map(axis_name => query.axis(axis_name)),
-    tags: () => query.axes().map(axis => axis.tags())
-      .reduce((xs,xss) => { xss.push(...xs); return xss; },[])
-  };
+    })
+  });
 
   return query;
 };

@@ -68,5 +68,17 @@ describe('unmerge', function() {
     expect(query.axis('outcome').tag('success').axisName()).toEqual('outcome');
     expect(query.axis('outcome').tag('success').tagName()).toEqual('success');
     expect(query.axis('outcome').tag('success').valueNames()).toEqual(['woof']);
+
+    expect(query.axis('outcome').pathEquals(query.axis('outcome'))).toBe(true);
+    expect(query.axis('outcome').tag('success').pathEquals(query.axis('outcome').tag('success'))).toBe(true);
+    expect(query.axis('outcome').tag('success').axis('protocol').pathEquals(query.axis('outcome').tag('success').axis('protocol'))).toBe(true);
+    expect(query.axis('outcome').tag('success').axis('protocol').tag('http').pathEquals(query.axis('outcome').tag('success').axis('protocol').tag('http'))).toBe(true);
+    expect(query.axis('outcome').tag('success').value('woof').pathEquals(query.axis('outcome').tag('success').value('woof'))).toBe(true);
+
+    expect(query.axis('outcome').pathPrefixOf(query.axis('outcome'))).toBe(true);
+    expect(!query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome'))).toBe(true);
+    expect(query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome').tag('success').axis('protocol'))).toBe(true);
+    expect(query.axis('outcome').tag('success').axis('protocol').pathPrefixOf(query.axis('outcome').tag('success').axis('protocol').tag('http'))).toBe(true);
+    expect(query.axis('outcome').tag('success').pathPrefixOf(query.axis('outcome').tag('success').value('woof'))).toBe(true);
   });
 });

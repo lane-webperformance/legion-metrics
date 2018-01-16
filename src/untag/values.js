@@ -11,14 +11,14 @@ module.exports = function(root_blob, prefix_path) {
   if( !blob.values )
     throw new Error('not a values object (no blob.values field)');
 
-  const query = {
+  const query = Object.assign({}, require('./path_mixins'), {
     valueNames: function() {
       return Object.keys(blob.values);
     },
     values: function() {
       return this.valueNames().map(value_name => this.value(value_name));
     },
-    value: (value_name) => Object.assign({
+    value: (value_name) => Object.assign({}, require('./path_mixins'), {
       toString: function() {
         return value_name;
       },
@@ -50,7 +50,7 @@ module.exports = function(root_blob, prefix_path) {
         return reservoir.get(blob.values[value_name].interpretation$reservoir).reserve;
       }
     })
-  };
+  });
 
   return query;
 };
