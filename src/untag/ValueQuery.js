@@ -10,11 +10,11 @@ class ValueQuery extends AbstractQuery {
   }
 
   axisName() {
-    return this.path()[this.path().length-4];
+    return this.pop().axisName();
   }
 
   tagName() {
-    return this.path()[this.path().length-3];
+    return this.pop().tagName();
   }
 
   valueName() {
@@ -30,19 +30,19 @@ class ValueQuery extends AbstractQuery {
   }
 
   average() {
-    return new MeasurementQuery(this.rootBlob(), this.path().concat('$avg'), this, 'average', blob => blob.avg);
+    return new MeasurementQuery(this.rootBlob(), this.path().concat('$avg','avg'), this, 'average', blob => blob);
   }
 
   size() {
-    return new MeasurementQuery(this.rootBlob(), this.path().concat('$avg'), this, 'size', blob => blob.size);
+    return new MeasurementQuery(this.rootBlob(), this.path().concat('$avg','size'), this, 'size', blob => blob);
   }
 
   minimum() {
-    return new MeasurementQuery(this.rootBlob(), this.path().concat('$min'), this, 'size', blob => blob);
+    return new MeasurementQuery(this.rootBlob(), this.path().concat('$min'), this, 'minimum', blob => blob);
   }
 
   maximum() {
-    return new MeasurementQuery(this.rootBlob(), this.path().concat('$max'), this, 'size', blob => blob);
+    return new MeasurementQuery(this.rootBlob(), this.path().concat('$max'), this, 'maximum', blob => blob);
   }
 
   unit() {

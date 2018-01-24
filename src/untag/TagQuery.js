@@ -9,7 +9,7 @@ class TagQuery extends AbstractQuery {
   }
 
   axisName() {
-    return this.path()[this.path().length-2];
+    return this.pop().axisName();
   }
 
   tagName() {

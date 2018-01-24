@@ -10,15 +10,15 @@ class MeasurementQuery extends AbstractQuery {
   }
 
   axisName() {
-    return this.parent().axisName();
+    return this.pop().axisName();
   }
 
   tagName() {
-    return this.parent().tagName();
+    return this.pop().tagName();
   }
 
   valueName() {
-    return this.parent().valueName();
+    return this.pop().valueName();
   }
 
   measurementName() {
