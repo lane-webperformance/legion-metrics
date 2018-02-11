@@ -48,9 +48,10 @@ module.exports = function(a,b) {
     for( const i in xs ) {
       if( typeof xs[i].value === 'object' ) {
         result.push(xs[i]);
-        continue;  // not worth running an n^2 algorithm on something that will mostly never happen
-                   // alternately, if we're nubbing strings, they're probably all the same and this is running in constant time
-                   // why would we have a reservoir of any other type?
+        // not worth running an n^2 algorithm on something that will mostly never happen
+        // alternately, if we're nubbing strings, they're probably all the same and this is running in constant time
+        // why would we have a reservoir of any other type?
+        continue;
       }
 
       if( !seen.includes(xs[i].value) ) {

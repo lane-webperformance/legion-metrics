@@ -47,18 +47,18 @@ class ValueQuery extends AbstractQuery {
 
   unit() {
     return new MeasurementQuery(this.rootBlob(),
-                                this.path().concat('unit$reservoir'),
-                                this,
-                                'unit',
-                                blob => reservoir.get(blob));
+      this.path().concat('unit$reservoir'),
+      this,
+      'unit',
+      blob => reservoir.get(blob));
   }
 
   interpretation() {
     return new MeasurementQuery(this.rootBlob(),
-                                this.path().concat('interpretation$reservoir'),
-                                this,
-                                'unit',
-                                blob => reservoir.get(blob));
+      this.path().concat('interpretation$reservoir'),
+      this,
+      'unit',
+      blob => reservoir.get(blob));
   }
 }
 

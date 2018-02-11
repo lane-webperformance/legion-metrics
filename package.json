@@ -12,13 +12,13 @@
   "dependencies": {
     "csv-stringify": "^2.0.0",
     "immutable": "^3.8.1",
-    "ramda": "^0.23.0"
+    "ramda": "^0.25.0"
   },
   "devDependencies": {
-    "eslint": "^2.10.2",
+    "eslint": "^4.17.0",
     "eslint-plugin-promise": "^3.5.0",
     "istanbul": "^0.4.2",
-    "jasmine": "^2.4.1",
+    "jasmine": "^3.0.0",
     "jasmine-immutablejs-matchers": "^0.1.2",
     "rimraf": "^2.5.2"
   }
